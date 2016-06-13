@@ -3,6 +3,18 @@
 require 'curses'
 include Curses
 
+ACS_ULCORNER = 'l'
+ACS_LLCORNER = 'm'
+ACS_URCORNER = 'k'
+ACS_LRCORNER = 'j'
+ACS_LTEE     = 't'
+ACS_RTEE     = 'u'
+ACS_BTEE     = 'v'
+ACS_TTEE     = 'w'
+ACS_HLINE    = 'q'
+ACS_VLINE    = 'x'
+ACS_PLUS     = 'n'
+
 class MyWindow < Window
   def fmtCase; "%8d  %.#{maxx - 10}s"; end
 
@@ -40,19 +52,19 @@ begin
     # draw vertical line between lhs & rhs
     (0...rhs.maxy).each do |i|
       stdscr.setpos(i, rhs.begx - 1)
-      stdscr.acs { stdscr.addch('x') }  # poor man's ACS_VLINE
+      stdscr.acs { stdscr.addch(ACS_VLINE) }
     end
 
     # draw remainder of border on won
     won.setpos(0, rhs.begx - 1)
-    won.acs { won.addstr('m' + 'q' * rhs.maxx) }  # poor man's ACS_LLCORNER & ACS_HLINE
+    won.acs { won.addstr(ACS_LLCORNER + ACS_HLINE * rhs.maxx) }
   end
 
   loop do
     won.mvprintw(1, 0, won.fmtCase, 94108, "San Francisco Lindy Exchange")
 
     clk.setpos(0, 0)
-    clk.acs { clk.addstr('q' * cols) }  # poor man's ACS_HLINE
+    clk.acs { clk.addstr(ACS_HLINE * cols) }
 
     clk.setpos(0, 0)
     clk.rvideo { clk.addstr(Time.now.strftime(" #{fmtClk} ")) }
