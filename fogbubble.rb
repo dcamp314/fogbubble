@@ -70,7 +70,7 @@ begin
     clk.rvideo { clk.addstr(Time.now.strftime(" #{fmtClk} ")) }
 
     # refresh windows & update screen
-    windows.map(&:noutrefresh)
+    windows.each(&:noutrefresh)
     doupdate
 
     # sleep for remainder of current wall clock second
@@ -78,7 +78,7 @@ begin
   end
 
   # free windows
-  windows.map(&:close)
+  windows.each(&:close)
 rescue Interrupt  # Ctrl-C to break
 ensure
   close_screen
