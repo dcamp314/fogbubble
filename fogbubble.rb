@@ -58,17 +58,8 @@ begin
   windows << clk = MyWindow.new(2, cols, lines - 2, 0)
 
   # draw border around rhs
-  begin
-    # draw vertical line between lhs & rhs
-    (0...rhs.maxy).each do |i|
-      stdscr.setpos(i, rhs.begx - 1)
-      stdscr.acs { stdscr.addch(ACS_VLINE) }
-    end
-
-    # draw remainder of border on won
-    won.setpos(0, rhs.begx - 1)
-    won.acs { won.addstr(ACS_LLCORNER + ACS_HLINE * rhs.maxx) }
-  end
+  (0...rhs.maxy).each { |i| stdscr.acs { stdscr.mvprintw(i, rhs.begx - 1, ACS_VLINE) } }
+  won.acs { won.mvprintw(0, rhs.begx - 1, ACS_LLCORNER + ACS_HLINE * rhs.maxx) }
 
   loop do
     lhs.rvideo { lhs.mvprintw 0, 0, Time.now.strftime(" #{Config.fmtDate} ") }
