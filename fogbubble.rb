@@ -13,6 +13,8 @@ class MyWindow < Window
 
   def fmtCase; "%8d  %.#{getmaxx - 10}s"; end
 
+  def rvideo; attron(A_REVERSE) { yield }; end
+
   def mvprintw(y, x, fmt, *args)
     setpos(y, x)
     addstr(sprintf(fmt, *args))
@@ -34,7 +36,7 @@ begin
 
   # create "Working On" window
   windows << won = MyWindow.new(2, cols, lines - 4, 0)
-  won.attron(A_REVERSE) { won.addstr(" Working On ") }
+  won.rvideo { won.addstr(" Working On ") }
 
   # create clock/ticker window
   windows << clk = MyWindow.new(2, cols, lines - 2, 0)
@@ -64,7 +66,7 @@ begin
     clk.attron(A_ALTCHARSET) { clk.addstr('q' * cols) }  # poor man's ACS_HLINE
 
     clk.setpos(0, 0)
-    clk.attron(A_REVERSE) { clk.addstr(Time.now.strftime(" #{fmtClk} ")) }
+    clk.rvideo { clk.addstr(Time.now.strftime(" #{fmtClk} ")) }
 
     # refresh
     windows.each {|w| w.noutrefresh }
