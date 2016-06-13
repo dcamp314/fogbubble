@@ -13,6 +13,7 @@ class MyWindow < Window
 
   def fmtCase; "%8d  %.#{getmaxx - 10}s"; end
 
+  def acs; attron(A_ALTCHARSET) { yield }; end
   def rvideo; attron(A_REVERSE) { yield }; end
   def mvprintw(y, x, fmt, *args); setpos(y, x); addstr(sprintf(fmt, *args)); end
 end
@@ -43,23 +44,20 @@ begin
     # draw vertical line between lhs & rhs
     (0...rhs.getmaxy).each do |i|
       stdscr.setpos(i, rhs.getbegx - 1)
-      stdscr.attron(A_ALTCHARSET) { stdscr.addch('x') }  # poor man's ACS_VLINE
+#      stdscr.acs { stdscr.addch('x') }  # poor man's ACS_VLINE
     end
     stdscr.noutrefresh
 
     # draw remainder of border on won
     won.setpos(0, rhs.getbegx - 1)
-    won.attron(A_ALTCHARSET) do
-      won.addch('m')                 # poor man's ACS_LLCORNER
-      won.addstr('q' * rhs.getmaxx)  # poor man's ACS_HLINE
-    end
+    won.acs { won.addstr('m' + 'q' * rhs.getmaxx) }  # poor man's ACS_LLCORNER & ACS_HLINE
   end
 
   loop do
     won.mvprintw(1, 0, won.fmtCase, 94108, "San Francisco Lindy Exchange")
 
     clk.setpos(0, 0)
-    clk.attron(A_ALTCHARSET) { clk.addstr('q' * cols) }  # poor man's ACS_HLINE
+    clk.acs { clk.addstr('q' * cols) }  # poor man's ACS_HLINE
 
     clk.setpos(0, 0)
     clk.rvideo { clk.addstr(Time.now.strftime(" #{fmtClk} ")) }
