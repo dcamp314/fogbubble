@@ -71,6 +71,9 @@ begin
     # sleep for remainder of current wall clock second
     sleep(1 - 1e-6 * Time.now.usec)
   end
+
+  # free windows
+  windows.map(&:close)
 rescue Interrupt  # Ctrl-C to break
 ensure
   close_screen
