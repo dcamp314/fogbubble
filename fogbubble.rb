@@ -64,8 +64,8 @@ begin
     clk.setpos(0, 0)
     clk.rvideo { clk.addstr(Time.now.strftime(" #{fmtClk} ")) }
 
-    # refresh
-    windows.each {|w| w.noutrefresh }
+    # refresh windows & update screen
+    windows.map(&:noutrefresh)
     doupdate
 
     # sleep for remainder of current wall clock second
