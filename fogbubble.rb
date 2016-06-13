@@ -13,7 +13,7 @@ begin
 
   loop do
     clk.setpos(0, 0)
-    clk.addstr(Time.now.strftime(" #{fmtClk} "))
+    clk.attron(A_REVERSE) { clk.addstr(Time.now.strftime(" #{fmtClk} ")) }
     clk.refresh
 
     # sleep for remainder of current wall clock second
