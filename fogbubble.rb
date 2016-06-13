@@ -10,6 +10,8 @@ class MyWindow < Window
     super
     @getmaxy, @getmaxx, @getbegy, @getbegx = h, w, y, x
   end
+
+  def fmtCase; "%8d  %.#{getmaxx - 10}s"; end
 end
 
 begin
@@ -51,6 +53,9 @@ begin
   end
 
   loop do
+    won.setpos(1, 0)
+    won.addstr(sprintf(won.fmtCase, 94108, "San Francisco Lindy Exchange"))
+
     clk.setpos(0, 0)
     clk.attron(A_ALTCHARSET) { clk.addstr('q' * cols) }  # poor man's ACS_HLINE
 
