@@ -14,11 +14,7 @@ class MyWindow < Window
   def fmtCase; "%8d  %.#{getmaxx - 10}s"; end
 
   def rvideo; attron(A_REVERSE) { yield }; end
-
-  def mvprintw(y, x, fmt, *args)
-    setpos(y, x)
-    addstr(sprintf(fmt, *args))
-  end
+  def mvprintw(y, x, fmt, *args); setpos(y, x); addstr(sprintf(fmt, *args)); end
 end
 
 begin
