@@ -39,46 +39,54 @@ begin
   noecho
   curs_set 0
 
-  windows = []  # keep a list of windows
-
-  # overwrite default stdscr with a MyWindow
-  windows << stdscr = MyWindow.new(lines, cols, 0, 0)
-
-  # create left-hand side window (resolved cases)
-  windows << lhs = MyWindow.new(lines - 4, (cols - 1) / 2, 0, 0)
-
-  # create right-hand side window (active cases)
-  windows << rhs = MyWindow.new(lines - 4, cols / 2, 0, cols - (cols / 2))
-
-  # create "Working On" window
-  windows << won = MyWindow.new(2, cols, lines - 4, 0)
-  won.rvideo { won.addstr(" Working On ") }
-
-  # create clock/ticker window
-  windows << clk = MyWindow.new(2, cols, lines - 2, 0)
-
-  # draw border around rhs
-  (0...rhs.maxy).each { |i| stdscr.acs { stdscr.mvprintw(i, rhs.begx - 1, ACS_VLINE) } }
-  won.acs { won.mvprintw(0, rhs.begx - 1, ACS_LLCORNER + ACS_HLINE * rhs.maxx) }
-
   loop do
-    lhs.rvideo { lhs.mvprintw 0, 0, Time.now.strftime(" #{Config.fmtDate} ") }
+    fail "terminal too small" if lines < 5 || cols < 21
+    previous = [lines, cols]
 
-    won.mvprintw(1, 0, won.fmtCase, 94108, "San Francisco Lindy Exchange")
+    windows = []  # keep a list of windows
 
-    clk.acs { clk.mvprintw(0, 0, ACS_HLINE * cols) }
-    clk.rvideo { clk.mvprintw(0, 0, Time.now.strftime(" #{Config.fmtClk} ")) }
+    # overwrite default stdscr with a MyWindow
+    windows << stdscr = MyWindow.new(lines, cols, 0, 0)
 
-    # refresh windows & update screen
-    windows.each(&:noutrefresh)
-    doupdate
+    # create left-hand side window (resolved cases)
+    windows << lhs = MyWindow.new(lines - 4, (cols - 1) / 2, 0, 0)
 
-    # sleep for remainder of current wall clock second
-    sleep(1 - 1e-6 * Time.now.usec)
+    # create right-hand side window (active cases)
+    windows << rhs = MyWindow.new(lines - 4, cols / 2, 0, cols - (cols / 2))
+
+    # create "Working On" window
+    windows << won = MyWindow.new(2, cols, lines - 4, 0)
+    won.rvideo { won.addstr(" Working On ") }
+
+    # create clock/ticker window
+    windows << clk = MyWindow.new(2, cols, lines - 2, 0)
+
+    # draw border around rhs
+    (0...rhs.maxy).each { |i| stdscr.acs { stdscr.mvprintw(i, rhs.begx - 1, ACS_VLINE) } }
+    won.acs { won.mvprintw(0, rhs.begx - 1, ACS_LLCORNER + ACS_HLINE * rhs.maxx) }
+
+    loop do
+      lhs.rvideo { lhs.mvprintw 0, 0, Time.now.strftime(" #{Config.fmtDate} ") }
+
+      won.mvprintw(1, 0, won.fmtCase, 94108, "San Francisco Lindy Exchange")
+
+      clk.acs { clk.mvprintw(0, 0, ACS_HLINE * cols) }
+      clk.rvideo { clk.mvprintw(0, 0, Time.now.strftime(" #{Config.fmtClk} ")) }
+
+      # refresh windows & update screen
+      windows.each(&:noutrefresh)
+      doupdate
+
+      # sleep for remainder of current wall clock second
+      sleep(1 - 1e-6 * Time.now.usec)
+
+      # trigger redraw unless screen size is unchanged
+      break unless [lines, cols].eql? previous
+    end
+
+    # free windows
+    windows.each(&:close)
   end
-
-  # free windows
-  windows.each(&:close)
 rescue Interrupt  # Ctrl-C to break
 ensure
   close_screen
