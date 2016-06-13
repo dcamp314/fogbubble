@@ -7,8 +7,8 @@ class MyWindow < Window
   attr_reader :getmaxy, :getmaxx, :getbegy, :getbegx
 
   def initialize(h, w, y, x)
-    super
     @getmaxy, @getmaxx, @getbegy, @getbegx = h, w, y, x
+    super
   end
 
   def fmtCase; "%8d  %.#{getmaxx - 10}s"; end
