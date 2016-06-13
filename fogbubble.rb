@@ -66,11 +66,8 @@ begin
 
     won.mvprintw(1, 0, won.fmtCase, 94108, "San Francisco Lindy Exchange")
 
-    clk.setpos(0, 0)
-    clk.acs { clk.addstr(ACS_HLINE * cols) }
-
-    clk.setpos(0, 0)
-    clk.rvideo { clk.addstr(Time.now.strftime(" #{Config.fmtClk} ")) }
+    clk.acs { clk.mvprintw(0, 0, ACS_HLINE * cols) }
+    clk.rvideo { clk.mvprintw(0, 0, Time.now.strftime(" #{Config.fmtClk} ")) }
 
     # refresh windows & update screen
     windows.each(&:noutrefresh)
