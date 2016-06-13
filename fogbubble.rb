@@ -13,6 +13,9 @@ begin
 
   loop do
     clk.setpos(0, 0)
+    clk.attron(A_ALTCHARSET) { clk.addstr('q' * cols) }  # poor man's ACS_HLINE
+
+    clk.setpos(0, 0)
     clk.attron(A_REVERSE) { clk.addstr(Time.now.strftime(" #{fmtClk} ")) }
     clk.refresh
 
