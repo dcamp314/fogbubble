@@ -3,6 +3,15 @@
 require 'curses'
 include Curses
 
+class MyWindow < Window
+  attr_reader :getmaxy, :getmaxx, :getbegy, :getbegx
+
+  def initialize(h, w, y, x)
+    super
+    @getmaxy, @getmaxx, @getbegy, @getbegx = h, w, y, x
+  end
+end
+
 begin
   init_screen
   noecho
@@ -11,33 +20,33 @@ begin
   windows = []  # keep a list of windows
 
   # create left-hand side window (resolved cases)
-  windows << lhs = Window.new(lines - 4, (cols - 1) / 2, 0, 0)
+  windows << lhs = MyWindow.new(lines - 4, (cols - 1) / 2, 0, 0)
 
   # create right-hand side window (active cases)
-  windows << rhs = Window.new(lines - 4, cols / 2, 0, cols - (cols / 2))
+  windows << rhs = MyWindow.new(lines - 4, cols / 2, 0, cols - (cols / 2))
 
   # create "Working On" window
-  windows << won = Window.new(2, cols, lines - 4, 0)
+  windows << won = MyWindow.new(2, cols, lines - 4, 0)
   won.attron(A_REVERSE) { won.addstr(" Working On ") }
 
   # create clock/ticker window
-  windows << clk = Window.new(2, cols, lines - 2, 0)
+  windows << clk = MyWindow.new(2, cols, lines - 2, 0)
   fmtClk = "%H:%M:%S"
 
   # draw border around rhs
   begin
     # draw vertical line between lhs & rhs
-    (0...(lines - 4)).each do |i|
-      stdscr.setpos(i, (cols / 2) - 1)
+    (0...rhs.getmaxy).each do |i|
+      stdscr.setpos(i, rhs.getbegx - 1)
       stdscr.attron(A_ALTCHARSET) { stdscr.addch('x') }  # poor man's ACS_VLINE
     end
     stdscr.noutrefresh
 
     # draw remainder of border on won
-    won.setpos(0, (cols / 2) - 1)
+    won.setpos(0, rhs.getbegx - 1)
     won.attron(A_ALTCHARSET) do
-      won.addch('m')                # poor man's ACS_LLCORNER
-      won.addstr('q' * (cols / 2))  # poor man's ACS_HLINE
+      won.addch('m')                 # poor man's ACS_LLCORNER
+      won.addstr('q' * rhs.getmaxx)  # poor man's ACS_HLINE
     end
   end
 
