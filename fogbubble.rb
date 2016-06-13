@@ -4,14 +4,7 @@ require 'curses'
 include Curses
 
 class MyWindow < Window
-  attr_reader :getmaxy, :getmaxx, :getbegy, :getbegx
-
-  def initialize(h, w, y, x)
-    @getmaxy, @getmaxx, @getbegy, @getbegx = h, w, y, x
-    super
-  end
-
-  def fmtCase; "%8d  %.#{getmaxx - 10}s"; end
+  def fmtCase; "%8d  %.#{maxx - 10}s"; end
 
   def acs; attron(A_ALTCHARSET) { yield }; end
   def rvideo; attron(A_REVERSE) { yield }; end
@@ -45,14 +38,14 @@ begin
   # draw border around rhs
   begin
     # draw vertical line between lhs & rhs
-    (0...rhs.getmaxy).each do |i|
-      stdscr.setpos(i, rhs.getbegx - 1)
+    (0...rhs.maxy).each do |i|
+      stdscr.setpos(i, rhs.begx - 1)
       stdscr.acs { stdscr.addch('x') }  # poor man's ACS_VLINE
     end
 
     # draw remainder of border on won
-    won.setpos(0, rhs.getbegx - 1)
-    won.acs { won.addstr('m' + 'q' * rhs.getmaxx) }  # poor man's ACS_LLCORNER & ACS_HLINE
+    won.setpos(0, rhs.begx - 1)
+    won.acs { won.addstr('m' + 'q' * rhs.maxx) }  # poor man's ACS_LLCORNER & ACS_HLINE
   end
 
   loop do
