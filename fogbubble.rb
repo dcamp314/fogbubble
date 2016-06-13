@@ -2,6 +2,7 @@
 
 require 'curses'
 include Curses
+require 'yaml'
 
 ACS_ULCORNER = 'l'
 ACS_LLCORNER = 'm'
@@ -21,6 +22,16 @@ class MyWindow < Window
   def acs; attron(A_ALTCHARSET) { yield }; end
   def rvideo; attron(A_REVERSE) { yield }; end
   def mvprintw(y, x, fmt, *args); setpos(y, x); addstr(sprintf(fmt, *args)); end
+end
+
+class Config
+  @@defaults = YAML.load_file(File.expand_path("defaults.yaml", File.dirname($0)))
+  @@config   = YAML.load_file(File.expand_path("config.yaml",   File.dirname($0)))
+  @@user     = YAML.load_file(File.expand_path("~/.fogbubble/config.yaml")) rescue {}
+
+  def self.method_missing(k)
+    @@user[k.to_s] || @@config[k.to_s] || @@defaults[k.to_s]
+  end
 end
 
 begin
@@ -45,7 +56,6 @@ begin
 
   # create clock/ticker window
   windows << clk = MyWindow.new(2, cols, lines - 2, 0)
-  fmtClk = "%H:%M:%S"
 
   # draw border around rhs
   begin
@@ -61,13 +71,15 @@ begin
   end
 
   loop do
+    lhs.rvideo { lhs.mvprintw 0, 0, Time.now.strftime(" #{Config.fmtDate} ") }
+
     won.mvprintw(1, 0, won.fmtCase, 94108, "San Francisco Lindy Exchange")
 
     clk.setpos(0, 0)
     clk.acs { clk.addstr(ACS_HLINE * cols) }
 
     clk.setpos(0, 0)
-    clk.rvideo { clk.addstr(Time.now.strftime(" #{fmtClk} ")) }
+    clk.rvideo { clk.addstr(Time.now.strftime(" #{Config.fmtClk} ")) }
 
     # refresh windows & update screen
     windows.each(&:noutrefresh)
