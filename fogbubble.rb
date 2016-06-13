@@ -24,6 +24,23 @@ begin
   windows << clk = Window.new(2, cols, lines - 2, 0)
   fmtClk = "%H:%M:%S"
 
+  # draw border around rhs
+  begin
+    # draw vertical line between lhs & rhs
+    (0...(lines - 4)).each do |i|
+      stdscr.setpos(i, (cols / 2) - 1)
+      stdscr.attron(A_ALTCHARSET) { stdscr.addch('x') }  # poor man's ACS_VLINE
+    end
+    stdscr.noutrefresh
+
+    # draw remainder of border on won
+    won.setpos(0, (cols / 2) - 1)
+    won.attron(A_ALTCHARSET) do
+      won.addch('m')                # poor man's ACS_LLCORNER
+      won.addstr('q' * (cols / 2))  # poor man's ACS_HLINE
+    end
+  end
+
   loop do
     clk.setpos(0, 0)
     clk.attron(A_ALTCHARSET) { clk.addstr('q' * cols) }  # poor man's ACS_HLINE
