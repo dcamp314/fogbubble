@@ -25,6 +25,9 @@ begin
 
   windows = []  # keep a list of windows
 
+  # overwrite default stdscr with a MyWindow
+  windows << stdscr = MyWindow.new(lines, cols, 0, 0)
+
   # create left-hand side window (resolved cases)
   windows << lhs = MyWindow.new(lines - 4, (cols - 1) / 2, 0, 0)
 
@@ -44,9 +47,8 @@ begin
     # draw vertical line between lhs & rhs
     (0...rhs.getmaxy).each do |i|
       stdscr.setpos(i, rhs.getbegx - 1)
-#      stdscr.acs { stdscr.addch('x') }  # poor man's ACS_VLINE
+      stdscr.acs { stdscr.addch('x') }  # poor man's ACS_VLINE
     end
-    stdscr.noutrefresh
 
     # draw remainder of border on won
     won.setpos(0, rhs.getbegx - 1)
