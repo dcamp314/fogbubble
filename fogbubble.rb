@@ -12,6 +12,11 @@ class MyWindow < Window
   end
 
   def fmtCase; "%8d  %.#{getmaxx - 10}s"; end
+
+  def mvprintw(y, x, fmt, *args)
+    setpos(y, x)
+    addstr(sprintf(fmt, *args))
+  end
 end
 
 begin
@@ -53,8 +58,7 @@ begin
   end
 
   loop do
-    won.setpos(1, 0)
-    won.addstr(sprintf(won.fmtCase, 94108, "San Francisco Lindy Exchange"))
+    won.mvprintw(1, 0, won.fmtCase, 94108, "San Francisco Lindy Exchange")
 
     clk.setpos(0, 0)
     clk.attron(A_ALTCHARSET) { clk.addstr('q' * cols) }  # poor man's ACS_HLINE
