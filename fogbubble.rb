@@ -16,7 +16,8 @@ ACS_HLINE    = 'q'
 ACS_VLINE    = 'x'
 ACS_PLUS     = 'n'
 
-class MyWindow < Window
+# add some methods to Curses::Window
+class Window
   def fmtCase; "%8d  %.#{maxx - 10}s"; end
 
   def acs; attron(A_ALTCHARSET) { yield }; end
@@ -45,25 +46,23 @@ begin
 
     windows = []  # keep a list of windows
 
-    # overwrite default stdscr with a MyWindow
-    windows << stdscr = MyWindow.new(lines, cols, 0, 0)
-
     # create left-hand side window (resolved cases)
-    windows << lhs = MyWindow.new(lines - 4, (cols - 1) / 2, 0, 0)
+    windows << lhs = Window.new(lines - 4, (cols - 1) / 2, 0, 0)
 
     # create right-hand side window (active cases)
-    windows << rhs = MyWindow.new(lines - 4, cols / 2, 0, cols - (cols / 2))
+    windows << rhs = Window.new(lines - 4, cols / 2, 0, cols - (cols / 2))
 
     # create "Working On" window
-    windows << won = MyWindow.new(2, cols, lines - 4, 0)
+    windows << won = Window.new(2, cols, lines - 4, 0)
     won.rvideo { won.addstr(" Working On ") }
 
     # create clock/ticker window
-    windows << clk = MyWindow.new(2, cols, lines - 2, 0)
+    windows << clk = Window.new(2, cols, lines - 2, 0)
 
     # draw border around rhs
-    (0...rhs.maxy).each { |i| stdscr.acs { stdscr.mvprintw(i, rhs.begx - 1, ACS_VLINE) } }
     won.acs { won.mvprintw(0, rhs.begx - 1, ACS_LLCORNER + ACS_HLINE * rhs.maxx) }
+    (0...rhs.maxy).each { |i| stdscr.acs { stdscr.mvprintw(i, rhs.begx - 1, ACS_VLINE) } }
+    stdscr.noutrefresh
 
     loop do
       lhs.rvideo { lhs.mvprintw 0, 0, Time.now.strftime(" #{Config.fmtDate} ") }
