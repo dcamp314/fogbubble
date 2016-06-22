@@ -18,11 +18,11 @@ ACS_PLUS     = 'n'
 
 # add some methods to Curses::Window
 class Window
-  def fmtCase; "%8d  %.#{maxx - 10}s"; end
-
   def acs; attron(A_ALTCHARSET) { yield }; end
   def rvideo; attron(A_REVERSE) { yield }; end
   def mvprintw(y, x, fmt, *args); setpos(y, x); addstr(sprintf(fmt, *args)); end
+
+  def fmtCase; "%8d  %.#{maxx - 10}s"; end
 end
 
 class Config
