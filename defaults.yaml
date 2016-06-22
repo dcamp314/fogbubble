@@ -1,3 +1,15 @@
+# Base URL of your FogBugz installation
+sFogBugzURL: "https://yourcompany.fogbugz.com/"  # Remember to use HTTPS.
+
+# If you supply a token you don't need to supply email and password.
+# Obtain a token from your User Options Page (/f/userPrefs or 
+# Avatar > Options) by clicking the "Create API Token" button.
+token: ""
+
+# User logon info -- will be ignored if token is supplied
+sEmail: "user@yourcompany.com"	# email or full name of FogBugz user
+sPassword: ""
+
 # Date format
 fmtDate: "%-m/%-d %a"	# 9/30 Thu
 #fmtDate: "%Y-%j %a"	# 2010-273 Thu (ISO 8601 ordinal date w/ abbreviated weekday name)
