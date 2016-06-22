@@ -27,8 +27,8 @@ end
 
 class Config
   @@defaults = YAML.load_file(File.expand_path("defaults.yaml", File.dirname($0)))
-  @@config   = YAML.load_file(File.expand_path("config.yaml",   File.dirname($0)))
-  @@user     = YAML.load_file(File.expand_path("~/.fogbubble/config.yaml")) rescue {}
+  @@config   = YAML.load_file(File.expand_path("config.yaml",   File.dirname($0))) rescue {}
+  @@user     = YAML.load_file(File.expand_path("~/.fogbubble/config.yaml"))        rescue {}
 
   def self.method_missing(k)
     @@user[k.to_s] || @@config[k.to_s] || @@defaults[k.to_s]
