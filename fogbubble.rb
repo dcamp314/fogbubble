@@ -2,6 +2,11 @@
 
 require 'curses'
 include Curses
+require 'erb'
+include ERB::Util
+require 'open-uri'
+require 'rexml/document'
+include REXML
 require 'yaml'
 
 ACS_ULCORNER = 'l'
@@ -15,6 +20,12 @@ ACS_TTEE     = 'w'
 ACS_HLINE    = 'q'
 ACS_VLINE    = 'x'
 ACS_PLUS     = 'n'
+
+MINVERSION_WARNING = <<HEREDOC
+Warning: FogBubble was written for FogBugz 8.
+Your FogBugz installation reports its compatibility "minversion" as %d.
+The interface may have changed and broken compatibility. Trying anyway...
+HEREDOC
 
 # add some methods to Curses::Window
 class Window
@@ -35,7 +46,29 @@ class Config
   end
 end
 
+class FogBugz
+  def self.initialize
+    doc = Document.new(open(Config.sFogBugzURL + "/api.xml"))
+
+    minversion = doc.elements["/response/minversion"].text.to_i
+    warn MINVERSION_WARNING % minversion if minversion > 8
+
+    @@api_url = Config.sFogBugzURL + '/' + doc.elements["/response/url"].text
+    token = unless Config.token.empty?; Config.token; else
+              FogBugz.logon(email: Config.sEmail, password: Config.sPassword).elements["/response/token"].text; end
+    @@api_url += "token=%s&" % token
+  end
+
+  def self.method_missing(cmd, args={})
+    Document.new(
+      open(@@api_url +
+           ["cmd=%s" % cmd,
+            args.map { |k,v| url_encode(k) + '=' + url_encode(v) }].join('&')))
+  end
+end
+
 begin
+  FogBugz.initialize
   init_screen
   noecho
   curs_set 0
