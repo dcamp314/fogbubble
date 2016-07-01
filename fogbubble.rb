@@ -37,12 +37,12 @@ end
 
 class FogBugz
   def self.initialize
-    doc = Document.new(open(Config.sFogBugzURL + "/api.xml"))
+    doc = Document.new(open("%s/api.xml" % Config.sFogBugzURL))
 
     minversion = doc.elements["/response/minversion"].text.to_i
     warn MINVERSION_WARNING % minversion if minversion > 8
 
-    @@api_url = Config.sFogBugzURL + '/' + doc.elements["/response/url"].text
+    @@api_url = "%s/%s" % [Config.sFogBugzURL, doc.elements["/response/url"].text]
     token = unless Config.token.empty?; Config.token; else
               FogBugz.logon(email: Config.sEmail, password: Config.sPassword).elements["/response/token"].text; end
     @@api_url += "token=%s&" % token
@@ -52,7 +52,7 @@ class FogBugz
     Document.new(
       open(@@api_url +
            ["cmd=%s" % cmd,
-            args.map { |k,v| url_encode(k) + '=' + url_encode(v) }].join('&')))
+            args.map { |k,v| "%s=%s" % [url_encode(k), url_encode(v)] }].join('&')))
   end
 end
 
@@ -87,12 +87,12 @@ begin
     stdscr.noutrefresh
 
     loop do
-      lhs.rvideo { lhs.mvprintw 0, 0, Time.now.strftime(" #{Config.fmtDate} ") }
+      lhs.rvideo { lhs.mvprintw 0, 0, Time.now.strftime(" %s " % Config.fmtDate) }
 
       won.mvprintw(1, 0, won.fmtCase, 94108, "San Francisco Lindy Exchange")
 
       clk.acs { clk.mvprintw(0, 0, ACS_HLINE * cols) }
-      clk.rvideo { clk.mvprintw(0, 0, Time.now.strftime(" #{Config.fmtClk} ")) }
+      clk.rvideo { clk.mvprintw(0, 0, Time.now.strftime(" %s " % Config.fmtClk)) }
 
       # refresh windows & update screen
       windows.each(&:noutrefresh)
