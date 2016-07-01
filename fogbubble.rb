@@ -1,25 +1,14 @@
 #!/usr/bin/env -S ruby -W
 
-require 'curses'
-include Curses
-require 'erb'
-include ERB::Util
+require 'curses'; include Curses
+require 'erb'; include ERB::Util
 require 'open-uri'
-require 'rexml/document'
-include REXML
+require 'rexml/document'; include REXML
 require 'yaml'
 
-ACS_ULCORNER = 'l'
-ACS_LLCORNER = 'm'
-ACS_URCORNER = 'k'
-ACS_LRCORNER = 'j'
-ACS_LTEE     = 't'
-ACS_RTEE     = 'u'
-ACS_BTEE     = 'v'
-ACS_TTEE     = 'w'
-ACS_HLINE    = 'q'
-ACS_VLINE    = 'x'
-ACS_PLUS     = 'n'
+ACS_ULCORNER = 'l'; ACS_LLCORNER = 'm'; ACS_URCORNER = 'k'; ACS_LRCORNER = 'j'
+ACS_LTEE     = 't'; ACS_RTEE     = 'u'; ACS_BTEE     = 'v'; ACS_TTEE     = 'w'
+ACS_HLINE    = 'q'; ACS_VLINE    = 'x'; ACS_PLUS     = 'n'
 
 MINVERSION_WARNING = <<HEREDOC
 Warning: FogBubble was written for FogBugz 8.
