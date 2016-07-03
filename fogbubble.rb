@@ -52,7 +52,7 @@ class FogBugz
     Document.new(
       open(@@api_url +
            ["cmd=%s" % cmd,
-            args.map { |k,v| "%s=%s" % [url_encode(k), url_encode(v)] }].join('&')))
+            args.map { |k, v| "%s=%s" % [url_encode(k), url_encode(v)] }].join('&')))
   end
 end
 
@@ -87,7 +87,7 @@ begin
     stdscr.noutrefresh
 
     loop do
-      lhs.rvideo { lhs.mvprintw 0, 0, Time.now.strftime(" %s " % Config.fmtDate) }
+      lhs.rvideo { lhs.mvprintw(0, 0, Time.now.strftime(" %s " % Config.fmtDate)) }
 
       won.mvprintw(1, 0, won.fmtCase, 94108, "San Francisco Lindy Exchange")
 
