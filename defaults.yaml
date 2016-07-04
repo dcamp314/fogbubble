@@ -28,3 +28,8 @@ fmtClk: "%-I:%M:%S %p"	# 4:00:00 PM
 # If you conceive of your days strictly according to the calendar, set this to 0 (i.e. midnight).
 # Defaults to 5 (i.e. 05:00 AM).
 nLogicalDayEnds: 5
+
+# Projects listed in the right-hand side window will be ordered by descending
+# unworked protected time remaining in the given look-back period.
+nLookBackPeriodDays: 7	# how many days to look back for timesheet intervals
+hrsLookBackPeriod: 40	# number of working hours in look-back period
