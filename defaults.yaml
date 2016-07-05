@@ -11,15 +11,15 @@ sEmail: "user@yourcompany.com"	# email or full name of FogBugz user
 sPassword: ""
 
 # Date format
-fmtDate: "%-m/%-d %a"	# 9/30 Thu
-#fmtDate: "%Y-%j %a"	# 2010-273 Thu (ISO 8601 ordinal date w/ abbreviated weekday name)
+fmtDate: "%-m/%-d %a"	# e.g. 9/30 Thu
+#fmtDate: "%Y-%j %a"	# e.g. 2010-273 Thu (ISO 8601 ordinal date w/ abbreviated weekday name)
 
 # Clock format
 # If you are running FogBubble across a WAN and wish to reduce traffic (e.g. you have
 # 3G and a low monthly usage allowance) you might wish to omit the display of seconds.
-fmtClk: "%-I:%M:%S %p"	# 4:00:00 PM
-#fmtClk: "%-I:%M %p"	# 4:00 PM
-#fmtClk: "%H:%M:%S"	# 16:00:00
+fmtClk: "%-I:%M:%S %p"	# e.g. 4:00:00 PM
+#fmtClk: "%-I:%M %p"	# e.g. 4:00 PM
+#fmtClk: "%H:%M:%S"	# e.g. 16:00:00
 
 # Hour of the day which divides days logically for you personally
 # The time by which you will almost always have gone to sleep and not yet woken for the day.
