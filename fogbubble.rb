@@ -52,8 +52,14 @@ class FogBugz
     Document.new(
       open(@@api_url +
            ["cmd=%s" % cmd,
-            args.map { |k, v| "%s=%s" % [url_encode(k), url_encode(v)] }].join('&')))
+            args.map { |k, v| "%s=%s" % [url_encode(k), url_encode(v)] }].join('&')),
+      ignore_whitespace_nodes: :all)
   end
+end
+
+def print_tree(n, indent=0)
+  puts "%s%s  (%s%s" % ["  " * indent, n.class.to_s.partition("::").last, n.to_s[0, 58], n.to_s.length > 58 ? "..." : ")"]
+  XPath.each(n, "child::node()") { |child| print_tree(child, indent + 1) }
 end
 
 begin
