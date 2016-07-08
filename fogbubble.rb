@@ -53,7 +53,7 @@ class FogBugz
       open(@@api_url +
            ["cmd=%s" % cmd,
             args.map { |k, v| "%s=%s" % [url_encode(k), url_encode(v)] }].join('&')),
-      ignore_whitespace_nodes: :all)
+      ignore_whitespace_nodes: :all).root
   end
 end
 
