@@ -64,6 +64,30 @@ end
 
 begin
   FogBugz.initialize
+
+  utcLookBackEnd   = Time.now.utc
+  utcLookBackStart = utcLookBackEnd - Config.nLookBackPeriodDays * 86400
+  # FogBugz intervals are always less than 24 hours, so beginning the listing a day early is
+  # sufficient to catch intervals starting before but ending within the look-back period
+  utcListStart     = utcLookBackStart - 86400
+  hrsPerBug        = Hash.new(0)
+  FogBugz.listIntervals(dtStart: utcListStart.xmlschema).each_element("//interval") do |i|
+    ixBug    = i.text("ixBug"  ).to_i
+    dtStart  = i.text("dtStart")
+    dtEnd    = i.text("dtEnd"  )  # text() returns nil if the tag is empty
+
+    # close interval if infinite
+    utcEnd   = dtEnd ? Time.xmlschema(dtEnd) : utcLookBackEnd
+
+    # clip older intervals to start of look-back period
+    utcStart = [Time.xmlschema(dtStart), utcLookBackStart].max
+    utcEnd   = [utcEnd,                  utcLookBackStart].max
+
+    hrsPerBug[ixBug] += (utcEnd - utcStart)/3600
+  end
+  puts hrsPerBug
+  exit
+
   init_screen
   noecho
   curs_set 0
