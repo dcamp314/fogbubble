@@ -58,6 +58,9 @@ class FogBugz
 end
 
 class ProtectedProject
+  extend Enumerable
+  def self.each(&block); @@list.each(&block); end
+
   attr_reader :ixProject, :nPercent, :sProject
 
   def self.initialize
