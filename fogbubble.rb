@@ -57,6 +57,17 @@ class FogBugz
   end
 end
 
+class ProtectedProject
+  def self.initialize
+    FogBugz.listProjectPercentTime.each_element("//projectpercenttime") do |p|
+      nPercent  = p.text("nPercent" ).to_i
+      ixProject = p.text("ixProject").to_i
+      sProject  = FogBugz.viewProject(ixProject: ixProject).text("//sProject")
+      puts "Project %s: %d%" % [sProject, nPercent]
+    end
+  end
+end
+
 def print_tree(n, indent=0)
   puts "%s%s  (%s%s" % ["  " * indent, n.class.to_s.partition("::").last, n.to_s[0, 58], n.to_s.length > 58 ? "..." : ")"]
   XPath.each(n, "child::node()") { |child| print_tree(child, indent + 1) }
@@ -64,6 +75,8 @@ end
 
 begin
   FogBugz.initialize
+  ProtectedProject.initialize
+  exit
 
   utcLookBackEnd   = Time.now.utc
   utcLookBackStart = utcLookBackEnd - Config.nLookBackPeriodDays * 86400
