@@ -59,12 +59,20 @@ end
 
 class ProtectedProject
   def self.initialize
-    FogBugz.listProjectPercentTime.each_element("//projectpercenttime") do |p|
-      nPercent  = p.text("nPercent" ).to_i
+    r = FogBugz.listProjectPercentTime
+    @@list = []
+    r.each_element("//projectpercenttime") do |p|
       ixProject = p.text("ixProject").to_i
-      sProject  = FogBugz.viewProject(ixProject: ixProject).text("//sProject")
-      puts "Project %s: %d%" % [sProject, nPercent]
+      nPercent  = p.text("nPercent" ).to_i
+      @@list << new(ixProject, nPercent)
     end
+    @@nPercentTimeAllOtherProjects = r.text("//nPercentTimeAllOtherProjects").to_i
+  end
+
+  def initialize(ixProject, nPercent)
+    @ixProject = ixProject
+    @nPercent  = nPercent
+    @sProject  = FogBugz.viewProject(ixProject: ixProject).text("//sProject")
   end
 end
 
