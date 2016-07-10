@@ -86,6 +86,29 @@ begin
     hrsPerBug[ixBug] += (utcEnd - utcStart)/3600
   end
   puts hrsPerBug
+  q = hrsPerBug.keys.map(&:to_s).join(',')
+  hrsPerProject = Hash.new(0)
+  r = FogBugz.search(q: q, cols: "ixBug,sTitle,ixProject,sProject")
+  r.each_element("//case") do |c|
+    ixBug     = c.text("ixBug"    ).to_i
+    sTitle    = c.text("sTitle"   )
+    ixProject = c.text("ixProject").to_i
+    sProject  = c.text("sProject" )
+    hrsPerProject[ixProject] += hrsPerBug[ixBug]
+    puts "Project %s: %d  %s (%f hrs worked)" % [sProject, ixBug, sTitle, hrsPerBug[ixBug]]
+  end
+  hrsPerProject.each_key do |ixProject|
+    nPercent                     = 10
+    hrsWorkedInLookBackPeriod    = hrsPerProject[ixProject]
+    hrsProtectedInLookBackPeriod = Config.hrsLookBackPeriod * nPercent / 100
+
+    if hrsWorkedInLookBackPeriod < hrsProtectedInLookBackPeriod
+      hrsRemainingInLookBackPeriod = hrsProtectedInLookBackPeriod - hrsWorkedInLookBackPeriod
+      puts "%3d (% 7.2f hrs worked, % 7.2f hrs remaining)" % [ixProject, hrsWorkedInLookBackPeriod, hrsRemainingInLookBackPeriod]
+    else
+      puts "%3d is up-to-date" % ixProject
+    end
+  end
   exit
 
   init_screen
