@@ -58,6 +58,8 @@ class FogBugz
 end
 
 class ProtectedProject
+  attr_reader :ixProject, :nPercent, :sProject
+
   def self.initialize
     r = FogBugz.listProjectPercentTime
     @@list = []
