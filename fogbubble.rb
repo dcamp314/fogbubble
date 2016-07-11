@@ -84,7 +84,7 @@ class Interval
   extend Enumerable
   def self.each(&block); @@list.each(&block); end
 
-  attr_reader :ixBug, :utcStart, :utcEnd
+  attr_reader :ixProject, :utcStart, :utcEnd
 
   def self.initialize
     utcLookBackEnd   = Time.now.utc
@@ -112,9 +112,9 @@ class Interval
   end
 
   def initialize(ixBug, utcStart, utcEnd)
-    @ixBug    = ixBug
-    @utcStart = utcStart
-    @utcEnd   = utcEnd
+    @ixProject = FogBugz.search(q: ixBug, cols: "ixProject").text("//ixProject").to_i
+    @utcStart  = utcStart
+    @utcEnd    = utcEnd
   end
 
   def hrsWorkedInLookBackPeriod; (utcEnd - utcStart)/3600; end
