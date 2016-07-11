@@ -80,6 +80,46 @@ class ProtectedProject
   end
 end
 
+class Interval
+  extend Enumerable
+  def self.each(&block); @@list.each(&block); end
+
+  attr_reader :ixBug, :utcStart, :utcEnd
+
+  def self.initialize
+    utcLookBackEnd   = Time.now.utc
+    utcLookBackStart = utcLookBackEnd - Config.nLookBackPeriodDays * 86400
+    # FogBugz intervals are always less than 24 hours, so beginning the listing a day early is
+    # sufficient to catch intervals starting before but ending within the look-back period
+    utcListStart     = utcLookBackStart - 86400
+    @@list = []
+    FogBugz.listIntervals(dtStart: utcListStart.xmlschema).each_element("//interval") do |i|
+      ixBug    = i.text("ixBug"  ).to_i
+      dtStart  = i.text("dtStart")
+      dtEnd    = i.text("dtEnd"  )  # text() returns nil if the tag is empty
+
+      # close interval if infinite
+      utcEnd   = dtEnd ? Time.xmlschema(dtEnd) : utcLookBackEnd
+
+      # clip older intervals to start of look-back period
+      utcStart = [Time.xmlschema(dtStart), utcLookBackStart].max
+      utcEnd   = [utcEnd,                  utcLookBackStart].max
+
+      # record unless clipped duration is 0
+      @@list << new(ixBug, utcStart, utcEnd) unless utcStart == utcEnd
+    end
+    @@list = @@list.sort_by(&:utcStart)
+  end
+
+  def initialize(ixBug, utcStart, utcEnd)
+    @ixBug    = ixBug
+    @utcStart = utcStart
+    @utcEnd   = utcEnd
+  end
+
+  def hrsWorkedInLookBackPeriod; (utcEnd - utcStart)/3600; end
+end
+
 def print_tree(n, indent=0)
   puts "%s%s  (%s%s" % ["  " * indent, n.class.to_s.partition("::").last, n.to_s[0, 58], n.to_s.length > 58 ? "..." : ")"]
   XPath.each(n, "child::node()") { |child| print_tree(child, indent + 1) }
@@ -88,28 +128,14 @@ end
 begin
   FogBugz.initialize
   ProtectedProject.initialize
+  Interval.initialize
 
-  utcLookBackEnd   = Time.now.utc
-  utcLookBackStart = utcLookBackEnd - Config.nLookBackPeriodDays * 86400
-  # FogBugz intervals are always less than 24 hours, so beginning the listing a day early is
-  # sufficient to catch intervals starting before but ending within the look-back period
-  utcListStart     = utcLookBackStart - 86400
-  hrsPerBug        = Hash.new(0)
-  FogBugz.listIntervals(dtStart: utcListStart.xmlschema).each_element("//interval") do |i|
-    ixBug    = i.text("ixBug"  ).to_i
-    dtStart  = i.text("dtStart")
-    dtEnd    = i.text("dtEnd"  )  # text() returns nil if the tag is empty
-
-    # close interval if infinite
-    utcEnd   = dtEnd ? Time.xmlschema(dtEnd) : utcLookBackEnd
-
-    # clip older intervals to start of look-back period
-    utcStart = [Time.xmlschema(dtStart), utcLookBackStart].max
-    utcEnd   = [utcEnd,                  utcLookBackStart].max
-
-    hrsPerBug[ixBug] += (utcEnd - utcStart)/3600
+  hrsPerBug = Hash.new(0)
+  Interval.each do |i|
+    hrsPerBug[i.ixBug] += i.hrsWorkedInLookBackPeriod
   end
   puts hrsPerBug
+  exit
   q = hrsPerBug.keys.map(&:to_s).join(',')
   hrsPerProject = Hash.new(0)
   r = FogBugz.search(q: q, cols: "ixBug,sTitle,ixProject,sProject")
