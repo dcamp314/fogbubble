@@ -89,7 +89,6 @@ end
 begin
   FogBugz.initialize
   ProtectedProject.initialize
-  exit
 
   utcLookBackEnd   = Time.now.utc
   utcLookBackStart = utcLookBackEnd - Config.nLookBackPeriodDays * 86400
@@ -123,16 +122,15 @@ begin
     hrsPerProject[ixProject] += hrsPerBug[ixBug]
     puts "Project %s: %d  %s (%f hrs worked)" % [sProject, ixBug, sTitle, hrsPerBug[ixBug]]
   end
-  hrsPerProject.each_key do |ixProject|
-    nPercent                     = 10
-    hrsWorkedInLookBackPeriod    = hrsPerProject[ixProject]
-    hrsProtectedInLookBackPeriod = Config.hrsLookBackPeriod * nPercent / 100
+  ProtectedProject.each do |p|
+    hrsWorkedInLookBackPeriod    = hrsPerProject[p.ixProject]
+    hrsProtectedInLookBackPeriod = Config.hrsLookBackPeriod * p.nPercent / 100
 
     if hrsWorkedInLookBackPeriod < hrsProtectedInLookBackPeriod
       hrsRemainingInLookBackPeriod = hrsProtectedInLookBackPeriod - hrsWorkedInLookBackPeriod
-      puts "%3d (% 7.2f hrs worked, % 7.2f hrs remaining)" % [ixProject, hrsWorkedInLookBackPeriod, hrsRemainingInLookBackPeriod]
+      puts "%11s (% 7.2f hrs worked, % 7.2f hrs remaining)" % [p.sProject, hrsWorkedInLookBackPeriod, hrsRemainingInLookBackPeriod]
     else
-      puts "%3d is up-to-date" % ixProject
+      puts "%11s is up-to-date" % p.sProject
     end
   end
   exit
