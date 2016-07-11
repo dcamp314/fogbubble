@@ -79,9 +79,13 @@ class ProtectedProject
     @sProject  = FogBugz.viewProject(ixProject: ixProject).text("//sProject")
   end
 
+  def hrsProtectedInLookBackPeriod; Config.hrsLookBackPeriod * nPercent / 100; end
+
   def hrsWorkedInLookBackPeriod
     Interval.reduce(0) { |acc, i| i.ixProject == ixProject ? acc + i.hrsWorkedInLookBackPeriod : acc }
   end
+
+  def hrsRemainingInLookBackPeriod; [hrsProtectedInLookBackPeriod - hrsWorkedInLookBackPeriod, 0].max; end
 end
 
 class Interval
@@ -135,11 +139,8 @@ begin
   Interval.initialize
 
   ProtectedProject.each do |p|
-    hrsProtectedInLookBackPeriod = Config.hrsLookBackPeriod * p.nPercent / 100
-
-    if p.hrsWorkedInLookBackPeriod < hrsProtectedInLookBackPeriod
-      hrsRemainingInLookBackPeriod = hrsProtectedInLookBackPeriod - p.hrsWorkedInLookBackPeriod
-      puts "%11s (% 7.2f hrs worked, % 7.2f hrs remaining)" % [p.sProject, p.hrsWorkedInLookBackPeriod, hrsRemainingInLookBackPeriod]
+    if p.hrsWorkedInLookBackPeriod < p.hrsProtectedInLookBackPeriod
+      puts "%11s (% 7.2f hrs worked, % 7.2f hrs remaining)" % [p.sProject, p.hrsWorkedInLookBackPeriod, p.hrsRemainingInLookBackPeriod]
     else
       puts "%11s is up-to-date" % p.sProject
     end
