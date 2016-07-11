@@ -78,6 +78,10 @@ class ProtectedProject
     @nPercent  = nPercent
     @sProject  = FogBugz.viewProject(ixProject: ixProject).text("//sProject")
   end
+
+  def hrsWorkedInLookBackPeriod
+    Interval.reduce(0) { |acc, i| i.ixProject == ixProject ? acc + i.hrsWorkedInLookBackPeriod : acc }
+  end
 end
 
 class Interval
@@ -130,30 +134,12 @@ begin
   ProtectedProject.initialize
   Interval.initialize
 
-  hrsPerBug = Hash.new(0)
-  Interval.each do |i|
-    hrsPerBug[i.ixBug] += i.hrsWorkedInLookBackPeriod
-  end
-  puts hrsPerBug
-  exit
-  q = hrsPerBug.keys.map(&:to_s).join(',')
-  hrsPerProject = Hash.new(0)
-  r = FogBugz.search(q: q, cols: "ixBug,sTitle,ixProject,sProject")
-  r.each_element("//case") do |c|
-    ixBug     = c.text("ixBug"    ).to_i
-    sTitle    = c.text("sTitle"   )
-    ixProject = c.text("ixProject").to_i
-    sProject  = c.text("sProject" )
-    hrsPerProject[ixProject] += hrsPerBug[ixBug]
-    puts "Project %s: %d  %s (%f hrs worked)" % [sProject, ixBug, sTitle, hrsPerBug[ixBug]]
-  end
   ProtectedProject.each do |p|
-    hrsWorkedInLookBackPeriod    = hrsPerProject[p.ixProject]
     hrsProtectedInLookBackPeriod = Config.hrsLookBackPeriod * p.nPercent / 100
 
-    if hrsWorkedInLookBackPeriod < hrsProtectedInLookBackPeriod
-      hrsRemainingInLookBackPeriod = hrsProtectedInLookBackPeriod - hrsWorkedInLookBackPeriod
-      puts "%11s (% 7.2f hrs worked, % 7.2f hrs remaining)" % [p.sProject, hrsWorkedInLookBackPeriod, hrsRemainingInLookBackPeriod]
+    if p.hrsWorkedInLookBackPeriod < hrsProtectedInLookBackPeriod
+      hrsRemainingInLookBackPeriod = hrsProtectedInLookBackPeriod - p.hrsWorkedInLookBackPeriod
+      puts "%11s (% 7.2f hrs worked, % 7.2f hrs remaining)" % [p.sProject, p.hrsWorkedInLookBackPeriod, hrsRemainingInLookBackPeriod]
     else
       puts "%11s is up-to-date" % p.sProject
     end
