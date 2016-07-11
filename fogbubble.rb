@@ -139,14 +139,6 @@ begin
   ProtectedProject.initialize
   Interval.initialize
 
-  ProtectedProject.each do |p|
-    if p.hrsWorkedInLookBackPeriod < p.hrsProtectedInLookBackPeriod
-      puts "%11s (% 7.2f hrs worked, % 7.2f hrs remaining)" % [p.sProject, p.hrsWorkedInLookBackPeriod, p.hrsRemainingInLookBackPeriod]
-    else
-      puts "%11s is up-to-date" % p.sProject
-    end
-  end
-  exit
 
   init_screen
   noecho
@@ -187,6 +179,21 @@ begin
       # refresh windows & update screen
       windows.each(&:noutrefresh)
       doupdate
+
+      ProtectedProject.sort_by(&:hrsRemainingInLookBackPeriod).reverse_each do |p|
+        if (hrsRemainingInLookBackPeriod = p.hrsRemainingInLookBackPeriod) > 0
+          rhs.rvideo { rhs.addstr(" %s " % p.sProject) }
+          rhs.addstr(" (%.2f hrs remaining)\n" % hrsRemainingInLookBackPeriod)
+
+          rows = Math.log2(hrsRemainingInLookBackPeriod / Config.hrsLogarithmicReference).round
+          rows = 1 if rows < 1  # always display at least one row if any hrs remain
+
+          rows.times do |i|
+            rhs.addstr(rhs.fmtCase % [i + 1, ""])
+            rhs.addstr("\n")
+          end
+        end
+      end
 
       # sleep for remainder of current wall clock second
       sleep(1 - 1e-6 * Time.now.usec)
