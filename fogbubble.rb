@@ -20,6 +20,7 @@ HEREDOC
 class Window
   def acs; attron(A_ALTCHARSET) { yield }; end
   def rvideo; attron(A_REVERSE) { yield }; end
+  def uline; attron(A_UNDERLINE) { yield }; end
   def mvprintw(y, x, fmt, *args); setpos(y, x); addstr(sprintf(fmt, *args)); end
 
   def fmtCase; "%8d  %.#{maxx - 10}s"; end
@@ -183,7 +184,7 @@ begin
       ProtectedProject.sort_by(&:hrsRemainingInLookBackPeriod).reverse_each do |p|
         if (hrsRemainingInLookBackPeriod = p.hrsRemainingInLookBackPeriod) > 0
           rhs.rvideo { rhs.addstr(" %s " % p.sProject) }
-          rhs.addstr(" (%.2f hrs remaining)\n" % hrsRemainingInLookBackPeriod)
+          rhs.uline { rhs.addstr(" (%.2f hrs remaining)\n" % hrsRemainingInLookBackPeriod) }
 
           rows = Math.log2(hrsRemainingInLookBackPeriod / Config.hrsLogarithmicReference).round
           rows = 1 if rows < 1  # always display at least one row if any hrs remain
