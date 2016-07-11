@@ -49,6 +49,7 @@ class FogBugz
   end
 
   def self.method_missing(cmd, args={})
+    STDERR.puts "%s(%s)" % [cmd, args]  # announce each API request
     Document.new(
       open(@@api_url +
            ["cmd=%s" % cmd,
