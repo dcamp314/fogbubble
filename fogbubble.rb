@@ -64,9 +64,8 @@ class ProtectedProject
   attr_reader :ixProject, :nPercent, :sProject
 
   def self.initialize
-    r = FogBugz.listProjectPercentTime
     @@list = []
-    r.each_element("//projectpercenttime") do |p|
+    (r = FogBugz.listProjectPercentTime).each_element("//projectpercenttime") do |p|
       ixProject = p.text("ixProject").to_i
       nPercent  = p.text("nPercent" ).to_i
       @@list << new(ixProject, nPercent)
