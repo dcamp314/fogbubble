@@ -191,8 +191,19 @@ begin
           rows = Math.log2(hrsRemainingInLookBackPeriod / Config.hrsLogarithmicReference).round
           rows = 1 if rows < 1  # always display at least one row if any hrs remain
 
-          rows.times do |i|
-            rhs.addstr(rhs.fmtCase % [i + 1, ""])
+          r = FogBugz.search(q: "assignedto:me status:active project:=%d" % p.ixProject, cols: "ixBug,sTitle")
+          e = r.get_elements("//case").first(rows)
+          e.each do |c|
+            ixBug  = c.text("ixBug" ).to_i
+            sTitle = c.text("sTitle")
+
+            rhs.addstr(rhs.fmtCase % [ixBug, sTitle])
+            rhs.addstr("\n")
+          end
+
+          # TODO delete
+          ((e.count + 1)..rows).each do |n|
+            rhs.addstr(rhs.fmtCase % [n, ""])
             rhs.addstr("\n")
           end
         end
