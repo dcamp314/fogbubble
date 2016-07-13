@@ -168,7 +168,7 @@ begin
 
     # draw border around rhs
     won.acs { won.mvprintw(0, rhs.begx - 1, ACS_LLCORNER + ACS_HLINE * rhs.maxx) }
-    (0...rhs.maxy).each { |i| stdscr.acs { stdscr.mvprintw(i, rhs.begx - 1, ACS_VLINE) } }
+    (0...rhs.maxy).each { |y| stdscr.acs { stdscr.mvprintw(y, rhs.begx - 1, ACS_VLINE) } }
     stdscr.noutrefresh
 
     loop do
