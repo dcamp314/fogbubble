@@ -61,37 +61,6 @@ class FogBugz
   end
 end
 
-class ProtectedProject
-  extend Enumerable
-  def self.each(&block); @@list.each(&block); end
-
-  attr_reader :ixProject, :nPercent, :sProject
-
-  def self.initialize
-    @@list = []
-    (r = FogBugz.listProjectPercentTime).each_element("//projectpercenttime") do |p|
-      ixProject = p.text("ixProject").to_i
-      nPercent  = p.text("nPercent" ).to_i
-      @@list << new(ixProject, nPercent)
-    end
-    @@nPercentTimeAllOtherProjects = r.text("//nPercentTimeAllOtherProjects").to_i
-  end
-
-  def initialize(ixProject, nPercent)
-    @ixProject = ixProject
-    @nPercent  = nPercent
-    @sProject  = FogBugz.viewProject(ixProject: ixProject).text("//sProject")
-  end
-
-  def hrsProtectedInLookBackPeriod; Config.hrsLookBackPeriod * nPercent / 100; end
-
-  def hrsWorkedInLookBackPeriod
-    Interval.reduce(0) { |acc, i| i.ixProject == ixProject ? acc + i.hrsWorkedInLookBackPeriod : acc }
-  end
-
-  def hrsRemainingInLookBackPeriod; [hrsProtectedInLookBackPeriod - hrsWorkedInLookBackPeriod, 0].max; end
-end
-
 class Interval
   extend Enumerable
   def self.each(&block); @@list.each(&block); end
@@ -130,6 +99,37 @@ class Interval
   end
 
   def hrsWorkedInLookBackPeriod; (utcEnd - utcStart)/3600; end
+end
+
+class ProtectedProject
+  extend Enumerable
+  def self.each(&block); @@list.each(&block); end
+
+  attr_reader :ixProject, :nPercent, :sProject
+
+  def self.initialize
+    @@list = []
+    (r = FogBugz.listProjectPercentTime).each_element("//projectpercenttime") do |p|
+      ixProject = p.text("ixProject").to_i
+      nPercent  = p.text("nPercent" ).to_i
+      @@list << new(ixProject, nPercent)
+    end
+    @@nPercentTimeAllOtherProjects = r.text("//nPercentTimeAllOtherProjects").to_i
+  end
+
+  def initialize(ixProject, nPercent)
+    @ixProject = ixProject
+    @nPercent  = nPercent
+    @sProject  = FogBugz.viewProject(ixProject: ixProject).text("//sProject")
+  end
+
+  def hrsProtectedInLookBackPeriod; Config.hrsLookBackPeriod * nPercent / 100; end
+
+  def hrsWorkedInLookBackPeriod
+    Interval.reduce(0) { |acc, i| i.ixProject == ixProject ? acc + i.hrsWorkedInLookBackPeriod : acc }
+  end
+
+  def hrsRemainingInLookBackPeriod; [hrsProtectedInLookBackPeriod - hrsWorkedInLookBackPeriod, 0].max; end
 end
 
 def print_tree(n, indent=0)
