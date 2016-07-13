@@ -51,11 +51,13 @@ class FogBugz
 
   def self.method_missing(cmd, args={})
     STDERR.puts "%s(%s)" % [cmd, args]  # announce each API request
-    Document.new(
+    r = Document.new(
       open(@@api_url +
            ["cmd=%s" % cmd,
             args.map { |k, v| "%s=%s" % [url_encode(k), url_encode(v)] }].join('&')),
       ignore_whitespace_nodes: :all).root
+    if e = r.elements["error"]; STDERR.puts e.text; end
+    r
   end
 end
 
