@@ -74,7 +74,7 @@ class Interval
     # sufficient to catch intervals starting before but ending within the look-back period
     utcListStart     = utcLookBackStart - 86400
     @@list = []
-    FogBugz.listIntervals(dtStart: utcListStart.xmlschema).each_element("//interval") do |i|
+    FogBugz.listIntervals(dtStart: utcListStart.xmlschema).elements.each("//interval") do |i|
       ixBug    = i.text("ixBug"  ).to_i
       dtStart  = i.text("dtStart")
       dtEnd    = i.text("dtEnd"  )  # text() returns nil if the tag is empty
@@ -109,7 +109,7 @@ class ProtectedProject
 
   def self.initialize
     @@list = []
-    (r = FogBugz.listProjectPercentTime).each_element("//projectpercenttime") do |p|
+    (r = FogBugz.listProjectPercentTime).elements.each("//projectpercenttime") do |p|
       ixProject = p.text("ixProject").to_i
       nPercent  = p.text("nPercent" ).to_i
       @@list << new(ixProject, nPercent)
