@@ -98,7 +98,7 @@ class Interval
     @utcEnd    = utcEnd
   end
 
-  def hrsWorkedInLookBackPeriod; (utcEnd - utcStart)/3600; end
+  def hrsWorkedInLookBackPeriod; (utcEnd - utcStart) / 3600; end
 end
 
 class ProtectedProject
