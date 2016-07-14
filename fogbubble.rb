@@ -69,7 +69,7 @@ class Interval
 
   def self.initialize
     utcLookBackEnd   = Time.now.utc
-    utcLookBackStart = utcLookBackEnd - Config.nLookBackPeriodDays * 86400
+    utcLookBackStart = utcLookBackEnd - Config.cLookBackPeriodDays * 86400
     # FogBugz intervals are always less than 24 hours, so beginning the listing a day early is
     # sufficient to catch intervals starting before but ending within the look-back period
     utcListStart     = utcLookBackStart - 86400

@@ -31,7 +31,7 @@ nLogicalDayEnds: 5
 
 # Projects listed in the right-hand side window will be ordered by descending
 # unworked protected time remaining in the given look-back period.
-nLookBackPeriodDays: 7	# how many days to look back for timesheet intervals
+cLookBackPeriodDays: 7	# how many days to look back for timesheet intervals
 hrsLookBackPeriod: 40	# number of working hours in look-back period
 
 # Timescale for displaying hours remaining per project protected time
