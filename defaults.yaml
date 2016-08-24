@@ -35,4 +35,4 @@ cLookBackPeriodDays: 7	# how many days to look back for timesheet intervals
 hrsLookBackPeriod: 40	# number of working hours in look-back period
 
 # Timescale for displaying hours remaining per project protected time
-hrsLogarithmicReference: 0.1  # i.e. 6 minutes
+hrsLogarithmicReference: 0.05  # i.e. 3 minutes
