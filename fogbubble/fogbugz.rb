@@ -30,11 +30,19 @@ class FogBugz
       [log_time,
        cmd, args] if $VERBOSE  # announce each API request
 
-    r = Document.new(
-      open(@@api_url +
-           ["cmd=%s" % cmd,
-            args.map { |k, v| "%s=%s" % [url_encode(k), url_encode(v)] }].
-           join('&')), ignore_whitespace_nodes: :all).root
+    begin
+      r = Document.new(
+        open(@@api_url +
+             ["cmd=%s" % cmd,
+              args.map { |k, v| "%s=%s" % [url_encode(k), url_encode(v)] }].
+             join('&')), ignore_whitespace_nodes: :all).root
+    rescue Timeout::Error => ex
+      warn "[%s] %s(%s) timed out: %s" %
+        [log_time,
+         cmd, args, ex]
+
+      Thread.exit
+    end
 
     if (e = r.elements["error"])
       raise e.text
