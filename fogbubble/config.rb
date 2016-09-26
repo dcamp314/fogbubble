@@ -13,4 +13,8 @@ class Config
       raise "undefined configuration parameter '%s'" % k
     end
   end
+
+  if sFogBugzURL.match("yourcompany")
+    raise "You must configure sFogBugzURL to point at your FogBugz installation."
+  end
 end
